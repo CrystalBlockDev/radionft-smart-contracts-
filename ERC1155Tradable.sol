@@ -181,6 +181,20 @@ contract ERC1155Tradable is ContextMixin, ERC1155, NativeMetaTransaction, Ownabl
   }
 
   /**
+    * @dev burn some amount of tokens to an address
+    * @param _to          Address of the future owner of the token
+    * @param _id          Token ID to mint
+    * @param _quantity    Amount of tokens to mint
+    */
+  function burn(
+    address _to,
+    uint256 _id,
+    uint256 _quantity
+  ) virtual public creatorOnly(_id) {
+    _burn(_to, _id, _quantity);
+  }
+  
+  /**
     * @dev Mint tokens for each id in _ids
     * @param _to          The address to mint tokens to
     * @param _ids         Array of ids to mint
