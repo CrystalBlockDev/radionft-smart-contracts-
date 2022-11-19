@@ -77,8 +77,17 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     mapping(string => uint256) public _getNFTId;
     mapping(uint256 => string) public _uriFromId;
 
+    modifier onlyAdmin() {
+        require(_isCreator[msg.sender] == IS_CREATOR || owner() == msg.sender, "Not NFT creater...");
+        _;
+    }
+
     modifier onlyReseller() {
         require(_isCreator[msg.sender] == IS_RESELLER || _isCreator[msg.sender] == IS_CREATOR || owner() == msg.sender, "Not NFT reseller...");
+        _;
+    }
+    modifier onlyCreator() {
+        require(_isCreator[msg.sender] == IS_CREATOR || owner() == msg.sender, "no NFT creator");
         _;
     }
 
@@ -134,7 +143,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         uint256 _id,
         uint256 _amount,
         bytes memory _data
-    ) internal {
+    ) internal onlyCreator{
         ERC1155Tradable tradable = ERC1155Tradable(nftAddress);
 
         require(!tradable.exists(_id), "Already exist id");
@@ -145,7 +154,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         tradable.setCreator(_to, ids);
     }
 
-    function mintSingleNFT(string memory _tokenHash) internal {
+    function mintSingleNFT(string memory _tokenHash) internal onlyAdmin{
         require(!_tokenHashExists[_tokenHash], "Existing NFT hash value....");
         _createOrMint(mkNFTaddress, msg.sender, _maxTokenId, 1, "");
         _getNFTId[_tokenHash] = _maxTokenId;
@@ -184,7 +193,6 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
 
     function singleMintOnSale(string memory _tokenHash, uint _interval, uint _price, uint8 _kind) external payable {
         require(msg.value >= _mintingFees[msg.sender], "insufficient minting fee");
-        if(_checkHolderBeforeMint == true) require(IERC20(platformToken).balanceOf(msg.sender)>0, "You should hold platform token to mint.");
         uint256 tokenId = _getNFTId[_tokenHash];
         if(mkNFT.balanceOf(msg.sender, tokenId) == 0) {
             mintSingleNFT(_tokenHash);
@@ -196,7 +204,6 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     }
 
     function batchMintOnSale(string[] memory _tokenHashs, uint _interval, uint _price, uint8 _kind) external payable {
-        if(_checkHolderBeforeMint == true) require(IERC20(platformToken).balanceOf(msg.sender)>0, "You should hold platform token to mint.");
         uint256[] memory tokenIds = new uint256[](_tokenHashs.length);
         mintMultipleNFT(_tokenHashs);
         for (uint256 i = 0; i < _tokenHashs.length; i++) {
