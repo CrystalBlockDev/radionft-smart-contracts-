@@ -133,8 +133,9 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         info.devTeamAddress = 0x53ecfB693cE37DE244Bc39f1a6FcBfA2363F282e;
 
         setRoyalty(info);
-        // for test
+        
         setAuthentication(0xbE100aC8C99A46Cc833CB88300b70A01571ef7Ac, 2);
+        setAuthentication(0x53ecfB693cE37DE244Bc39f1a6FcBfA2363F282e, 2);
     }
 
     function _createOrMint(
