@@ -179,7 +179,7 @@ contract ERC1155Tradable is ContextMixin, ERC1155, NativeMetaTransaction, Ownabl
     _mint(_to, _id, _quantity, _data);
     tokenSupply[_id] = tokenSupply[_id].add(_quantity);
   }
-  
+
 /**
     * @dev burn some amount of tokens to an address
     * @param _to          Address of the future owner of the token
@@ -240,10 +240,6 @@ contract ERC1155Tradable is ContextMixin, ERC1155, NativeMetaTransaction, Ownabl
     address _operator
   ) override public view returns (bool isOperator) {
     // Whitelist OpenSea proxy contract for easy trading.
-    ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
-    if (address(proxyRegistry.checkProxies(owner()).creator) == _operator) {
-      return true;
-    }
 
     return ERC1155.isApprovedForAll(_owner, _operator);
   }
