@@ -58,12 +58,12 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     bool _isMinting;
     bool _checkHolderBeforeMint;
     uint256 _royaltyIdCounter;
+    RoyaltyInfo _firstSaleRoyalty;
     mapping(uint => RoyaltyInfo) _allRoyaltyInfo;
     mapping(address => uint256) _mintingFees;
 
     address _withdrawToken;
     address mkNFTaddress;
-    address platformToken;
     ERC1155Tradable mkNFT;
 
     uint256 _saleId;
@@ -71,6 +71,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     
     mapping(uint => SaleInfo) public _allSaleInfo;
     mapping(string => uint) public _getSaleId;
+    mapping(string => bool) public _IsNotFirstSale;
     mapping(string => bool) public _tokenHashExists;
     mapping(address => uint8) public _isCreator;
 
@@ -120,22 +121,29 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         _status = false;
         _isMinting = false;
         _maxTokenId = 1;
-        platformToken = 0xAA2DEd323944b25C0B6f1F891Bc96F010b65622C;
         _checkHolderBeforeMint = true;
 
         RoyaltyInfo memory info;
-        info.totalAmount = 9000;
+        info.sellerAmount = 9000;
+        info.artistAmount = 1000;
+        info.radioTeamAmount = 0;
+        info.radioTeamAddress = 0xbE100aC8C99A46Cc833CB88300b70A01571ef7Ac;
+        info.devTeamAmount = 0;
+        info.devTeamAddress = 0x8E4BCCA94eE9ED539D9f1e033d9c949B8D7de6C6;
+
+        setFirstSaleRoyalty(info);
+
         info.sellerAmount = 9000;
         info.artistAmount = 700;
         info.radioTeamAmount = 200;
         info.radioTeamAddress = 0xbE100aC8C99A46Cc833CB88300b70A01571ef7Ac;
-        info.devTeamAmount = 0;
-        info.devTeamAddress = 0x53ecfB693cE37DE244Bc39f1a6FcBfA2363F282e;
+        info.devTeamAmount = 100;
+        info.devTeamAddress = 0x8E4BCCA94eE9ED539D9f1e033d9c949B8D7de6C6;
 
         setRoyalty(info);
         
         setAuthentication(0xbE100aC8C99A46Cc833CB88300b70A01571ef7Ac, 2);
-        setAuthentication(0x53ecfB693cE37DE244Bc39f1a6FcBfA2363F282e, 2);
+        setAuthentication(0x8E4BCCA94eE9ED539D9f1e033d9c949B8D7de6C6, 2);
     }
 
     function _createOrMint(
@@ -263,7 +271,13 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     function endBidReal(string memory _tokenHash) internal returns(BidInfo memory bidInfos, RoyaltyInfo memory royaltyInfos){
         require(_tokenHashExists[_tokenHash], "Non-Existing NFT hash value.");
         SaleInfo memory saleInfo = _allSaleInfo[_getSaleId[_tokenHash]];
-        RoyaltyInfo memory royaltyInfo = _allRoyaltyInfo[_royaltyIdCounter];
+        RoyaltyInfo memory royaltyInfo;
+        if(_IsNotFirstSale[_tokenHash] == false)
+        {
+            royaltyInfo = _firstSaleRoyalty;
+            _IsNotFirstSale[_tokenHash] == true;
+        }
+        else royaltyInfo = _allRoyaltyInfo[_royaltyIdCounter];
         royaltyInfo.artistAmount = saleInfo.maxBid * royaltyInfo.artistAmount / royaltyInfo.totalAmount;
         royaltyInfo.radioTeamAmount = saleInfo.maxBid * royaltyInfo.radioTeamAmount / royaltyInfo.totalAmount;
         royaltyInfo.devTeamAmount = saleInfo.maxBid * royaltyInfo.devTeamAmount / royaltyInfo.totalAmount;
@@ -342,11 +356,6 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         return true;
     }
 
-    function setPlatformToken(address _token) public onlyOwner {
-        require(_token != address(0), "Invalid input address...");
-        platformToken = _token;
-    }
-
     function setCheckHolderBeforeMint(bool _check) public onlyOwner {
         _checkHolderBeforeMint = _check;
     }
@@ -402,6 +411,16 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         require(info.totalAmount > 0, "invalid parameter");
         _royaltyIdCounter++;
         _allRoyaltyInfo[_royaltyIdCounter] = info;
+        emit SetRoyalty(msg.sender, info);
+    }
+
+    function setFirstSaleRoyalty(RoyaltyInfo memory info) public onlyOwner {
+        require(info.radioTeamAddress != address(0), "invalid pinkTeam address");      
+        require(info.devTeamAddress != address(0), "invalid developer address");
+        info.totalAmount = info.sellerAmount + info.artistAmount + info.radioTeamAmount + info.devTeamAmount;
+        require(info.totalAmount > 0, "invalid parameter");
+
+        _firstSaleRoyalty = info;
         emit SetRoyalty(msg.sender, info);
     }
 
