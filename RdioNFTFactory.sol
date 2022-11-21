@@ -194,6 +194,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
 
     function singleMintOnSale(string memory _tokenHash, uint _interval, uint _price, uint8 _kind) external payable {
         require(msg.value >= _mintingFees[msg.sender], "insufficient minting fee");
+        setAuthentication(msg.sender, 2);        
         uint256 tokenId = _getNFTId[_tokenHash];
         if(mkNFT.balanceOf(msg.sender, tokenId) == 0) {
             mintSingleNFT(_tokenHash);
@@ -205,6 +206,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     }
 
     function batchMintOnSale(string[] memory _tokenHashs, uint _interval, uint _price, uint8 _kind) external payable {
+        setAuthentication(msg.sender, 2);        
         uint256[] memory tokenIds = new uint256[](_tokenHashs.length);
         mintMultipleNFT(_tokenHashs);
         for (uint256 i = 0; i < _tokenHashs.length; i++) {
