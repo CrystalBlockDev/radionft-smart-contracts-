@@ -192,9 +192,9 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         return true;
     }
 
-    function singleMintOnSale(string memory _tokenHash, uint _interval, uint _price, uint8 _kind) external payable {
-        require(msg.value >= _mintingFees[msg.sender], "insufficient minting fee");
-        setAuthentication(msg.sender, 2);        
+    function singleMintOnSale(string memory _tokenHash, uint _interval, uint _price, uint8 _kind) external  {
+            
+        setAuthentication(msg.sender, 2);
         uint256 tokenId = _getNFTId[_tokenHash];
         if(mkNFT.balanceOf(msg.sender, tokenId) == 0) {
             mintSingleNFT(_tokenHash);
@@ -205,7 +205,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         _isMinting = false;
     }
 
-    function batchMintOnSale(string[] memory _tokenHashs, uint _interval, uint _price, uint8 _kind) external payable {
+    function batchMintOnSale(string[] memory _tokenHashs, uint _interval, uint _price, uint8 _kind) external  {
         setAuthentication(msg.sender, 2);        
         uint256[] memory tokenIds = new uint256[](_tokenHashs.length);
         mintMultipleNFT(_tokenHashs);
@@ -378,7 +378,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         return token.balanceOf(address(this));
     }
 
-    function setAuthentication(address _addr, uint8 _flag) public onlyOwner {
+    function setAuthentication(address _addr, uint8 _flag) internal {
         require(_addr != address(0), "Invalid input address...");
         _isCreator[_addr] = _flag;
         emit SetAuthentication(msg.sender, _addr, _flag);
