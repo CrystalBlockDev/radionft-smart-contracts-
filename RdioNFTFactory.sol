@@ -530,6 +530,11 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         return _withdrawToken;
     }
 
+    function setUtilityTOkenAddress(address token) external onlyOwner {
+        _utilityTokenAddress = token;
+        emit SetUtilityToken(msg.sender, token);
+    }
+
     function setWithdrawToken(address token) external onlyOwner {
         _withdrawToken = token;
         emit SetWithdrawToken(msg.sender, token);
@@ -581,4 +586,6 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     event CreateSaleReal(string _tokenHash, uint _interval, uint _price, uint8 _kind);
     event MintSingleNFT(string _tokenHash);
     event GiveTip2Artist(string tipId, address listener, address artist, uint256 amount);
+    event SetUtilityToken(address sender, address token);
+
 }
