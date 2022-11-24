@@ -831,6 +831,25 @@
 				"type": "address"
 			}
 		],
+		"name": "SetUtilityToken",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			}
+		],
 		"name": "SetWithdrawToken",
 		"type": "event"
 	},
@@ -1847,6 +1866,19 @@
 			}
 		],
 		"name": "setSaleId",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			}
+		],
+		"name": "setUtilityTOkenAddress",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
