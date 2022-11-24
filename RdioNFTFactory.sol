@@ -530,6 +530,10 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         return _withdrawToken;
     }
 
+    function getUtilityTOkenAddress() external view returns(address) {
+        return _utilityTokenAddress;
+    }
+
     function setUtilityTOkenAddress(address token) external onlyOwner {
         _utilityTokenAddress = token;
         emit SetUtilityToken(msg.sender, token);
