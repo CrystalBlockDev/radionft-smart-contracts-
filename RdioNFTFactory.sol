@@ -63,6 +63,7 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     mapping(address => uint256) _mintingFees;
 
     address _withdrawToken;
+    address _utilityTokenAddress;
     address mkNFTaddress;
     ERC1155Tradable mkNFT;
 
@@ -122,6 +123,9 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         _isMinting = false;
         _maxTokenId = 1;
         _checkHolderBeforeMint = true;
+        _utilityTokenAddress = 0xAA2DEd323944b25C0B6f1F891Bc96F010b65622C;  //address of TheRadio
+        //on Ethereeum 0xAA2DEd323944b25C0B6f1F891Bc96F010b65622C
+        //on Binance 0xAA2DEd323944b25C0B6f1F891Bc96F010b65622C
 
         RoyaltyInfo memory info;
         info.sellerAmount = 9000;
@@ -547,6 +551,13 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
         return this.onERC1155BatchReceived.selector;
     }
 
+    function giveTip2Artist(string memory tipId, address artist, uint256 amount)  external 
+    {
+        require(amount>0, "Amount should be lager than zero.");        
+        IERC20(_utilityTokenAddress).transferFrom(msg.sender, artist, amount);        
+        emit GiveTip2Artist(tipId, msg.sender, artist, amount);
+    }
+
     event MintSingleNFT(string tokenHash, uint256 tokenId);
     event SingleMintOnSale(address seller, string tokenHash, uint256 tokenId, uint256 interval, uint256 price, uint8 kind);
     event BatchMintOnSale(address seller, string[] tokenHashs, uint256[] tokenIds, uint256 interval, uint256 price, uint8 kind);
@@ -569,4 +580,5 @@ contract RadioNFTFactory is Ownable,ERC1155Receiver {
     event SetWithdrawToken(address sender, address token);
     event CreateSaleReal(string _tokenHash, uint _interval, uint _price, uint8 _kind);
     event MintSingleNFT(string _tokenHash);
+    event GiveTip2Artist(string tipId, address listener, address artist, uint256 amount);
 }
